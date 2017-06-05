@@ -1,45 +1,22 @@
-[ {
-  "id": "9d0ecd7f-ec0d-447e-80a1-6149cf368481",
-  "name": "first Service",
-  "description": "First Service",
+{
+  "id": "64aca71f-f2e9-4f3d-8e0e-9a3e1e5e3bb6",
+  "name": "concourse-ci",
+  "description": "Concourse CI team",
   "bindable": false,
   "metadata": {
-    "displayName": "First Service",
+    "displayName": "Concourse CI Team",
     "documentationUrl": ""
   },
   "plan_updateable": true,
   "plans": [
     {
-      "id": "320fa3df-7373-48c5-81c4-516fdd0c099f",
-      "name": "first plan",
-      "description": "first plan",
+      "id": "334744a3-f12f-4004-a94e-d7132a0d0706",
+      "name": "concourse-ci",
+      "description": "Concourse CI Team",
       "free": true,
       "metadata": {
-        "displayName": "first plan"
+        "displayName": "Concourse CI Team"
       }
     }
   ]
-},
-{
-"id": "327b2b52-7750-4873-9778-0aa7d9476c25",
-"name": "second service",
-"description": "second service",
-"bindable": false,
-"metadata": {
-  "displayName": "second service",
-  "documentationUrl": ""
-},
-"plan_updateable": true,
-"plans": [
-  {
-    "id": "d1444660-3763-43e7-86d5-d6f99b02f4dd",
-    "name": "second plan",
-    "description": "Second Plan",
-    "free": true,
-    "metadata": {
-      "displayName": "Second Plan"
-    }
-  }
-]
 }
-]
