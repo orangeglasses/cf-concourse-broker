@@ -1,0 +1,45 @@
+[ {
+  "id": "9d0ecd7f-ec0d-447e-80a1-6149cf368481",
+  "name": "first Service",
+  "description": "First Service",
+  "bindable": false,
+  "metadata": {
+    "displayName": "First Service",
+    "documentationUrl": ""
+  },
+  "plan_updateable": true,
+  "plans": [
+    {
+      "id": "320fa3df-7373-48c5-81c4-516fdd0c099f",
+      "name": "first plan",
+      "description": "first plan",
+      "free": true,
+      "metadata": {
+        "displayName": "first plan"
+      }
+    }
+  ]
+},
+{
+"id": "327b2b52-7750-4873-9778-0aa7d9476c25",
+"name": "second service",
+"description": "second service",
+"bindable": false,
+"metadata": {
+  "displayName": "second service",
+  "documentationUrl": ""
+},
+"plan_updateable": true,
+"plans": [
+  {
+    "id": "d1444660-3763-43e7-86d5-d6f99b02f4dd",
+    "name": "second plan",
+    "description": "Second Plan",
+    "free": true,
+    "metadata": {
+      "displayName": "Second Plan"
+    }
+  }
+]
+}
+]
