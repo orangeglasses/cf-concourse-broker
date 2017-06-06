@@ -37,6 +37,19 @@ func (b *broker) Provision(context context.Context, instanceID string, details b
 }
 
 func (b *broker) Deprovision(context context.Context, instanceID string, details brokerapi.DeprovisionDetails, asyncAllowed bool) (brokerapi.DeprovisionServiceSpec, error) {
+	cfClient, err := cfNewClient(b.env)
+	if err != nil {
+		return brokerapi.DeprovisionServiceSpec{}, err
+	}
+	cfDetails, err := cfClient.GetDeprovisionDetails(instanceID)
+	if err != nil {
+		return brokerapi.DeprovisionServiceSpec{}, err
+	}
+	concourseClient := concourseNewClient(b.env, b.logger)
+	err = concourseClient.DeleteTeam(cfDetails)
+	if err != nil {
+		return brokerapi.DeprovisionServiceSpec{}, err
+	}
 	return brokerapi.DeprovisionServiceSpec{}, nil
 }
 
