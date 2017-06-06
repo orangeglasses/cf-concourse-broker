@@ -20,7 +20,7 @@ type IccClient interface {
 }
 
 // NewClient returns a client that can be used to interface with a deployed Concourse CI instance.
-func NewClient(env brokerConfig, logger lager.Logger) IccClient {
+func concourseNewClient(env brokerConfig, logger lager.Logger) IccClient {
 	httpClient := newBasicAuthClient(env.AdminUsername, env.AdminPassword)
 
 	return &concourseClient{

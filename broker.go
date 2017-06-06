@@ -19,6 +19,20 @@ func (b *broker) Services(context context.Context) []brokerapi.Service {
 }
 
 func (b *broker) Provision(context context.Context, instanceID string, details brokerapi.ProvisionDetails, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
+	cfClient, err := cfNewClient(b.env)
+	if err != nil {
+		return brokerapi.ProvisionedServiceSpec{}, err
+	}
+	cfDetails, err := cfClient.GetProvisionDetails(details.SpaceGUID)
+	cfDetails.SpaceGUID = details.SpaceGUID
+	if err != nil {
+		return brokerapi.ProvisionedServiceSpec{}, err
+	}
+	concourseClient := concourseNewClient(b.env, b.logger)
+	err = concourseClient.CreateTeam(cfDetails)
+	if err != nil {
+		return brokerapi.ProvisionedServiceSpec{}, err
+	}
 	return brokerapi.ProvisionedServiceSpec{}, nil
 }
 
