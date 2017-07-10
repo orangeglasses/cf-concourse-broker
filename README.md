@@ -21,19 +21,6 @@ This application uses oauth to perform actions on your behalf in UAA.  To add a 
 
 ## Deployment
 
-### Automated
-
-The easiest/recommended way to deploy the broker is via the [Concourse](http://concourse.ci/) pipeline.
-
-1. Create a `ci/credentials.yml` file from the `ci/credentials.example.yml` (i.e. `cp ci/credentials.example.yml ci/credentials.yml`), and fill in the templated values from [the pipeline](ci/pipeline.yml).
-1. Deploy the pipeline.
-
-    ```bash
-    fly -t lite set-pipeline -n -c ci/pipeline.yml -p deploy-concourse-broker -l ci/credentials.yml
-    ```
-
-### Manual
-
 1. Clone this repository, and `cd` into it.
 1. Login to CF with admin permissions
 1. Target the space you want to deploy the broker to.
