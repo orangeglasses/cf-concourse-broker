@@ -1,13 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
 	"code.cloudfoundry.org/lager"
 	"github.com/concourse/atc"
-	"github.com/concourse/atc/auth/uaa"
 	"github.com/concourse/go-concourse/concourse"
 )
 
@@ -24,7 +22,7 @@ func concourseNewClient(env brokerConfig, logger lager.Logger) IccClient {
 	httpClient := newBasicAuthClient(env.AdminUsername, env.AdminPassword)
 
 	return &concourseClient{
-		client: concourse.NewClient(env.ConcourseURL, httpClient),
+		client: concourse.NewClient(env.ConcourseURL, httpClient, false),
 		env:    env,
 		logger: logger.Session("concourse-client")}
 }
@@ -36,13 +34,7 @@ type concourseClient struct {
 }
 
 func (c *concourseClient) getAuthClient(concourseURL string) (concourse.Client, error) {
-	team := c.client.Team(adminTeam)
-	token, err := team.AuthToken()
-	if err != nil {
-		return nil, err
-	}
-	httpClient := newOAuthClient(token.Type, token.Value)
-	return concourse.NewClient(concourseURL, httpClient), nil
+	return c.client, nil
 }
 
 func (c *concourseClient) getTeamName(details cfDetails) string {
@@ -51,45 +43,17 @@ func (c *concourseClient) getTeamName(details cfDetails) string {
 
 func (c *concourseClient) CreateTeam(details cfDetails) error {
 	teamName := c.getTeamName(details)
+
+	orgSpaceAuth := fmt.Sprintf("%v:%v", details.OrgName, details.SpaceName)
 	team := atc.Team{}
-	teamAuth := make(map[string]*json.RawMessage)
-
-	uaaAuthConfig := uaa.UAAAuthConfig{
-		ClientID:     c.env.ClientID,
-		ClientSecret: c.env.ClientSecret,
-		AuthURL:      c.env.AuthURL,
-		TokenURL:     c.env.TokenURL,
-		CFSpaces:     []string{details.SpaceGUID},
-		CFCACert:     "",
-		CFURL:        c.env.CFURL,
-	}
-
-	data, err := json.Marshal(uaaAuthConfig)
-	if err != nil {
-		fmt.Println("Invalid UAA config")
-		panic(err)
-	}
-
-	teamAuth["uaa"] = (*json.RawMessage)(&data)
-	/*fmt.Printf("{ClientID:%v,ClientSecret:%v,AuthURL:%v,TokenURL:%v,CFSpaces:%v,CFCACert:\"\",CFURL:%v}", c.env.ClientID, c.env.ClientSecret, c.env.AuthURL, c.env.TokenURL, []string{details.SpaceGUID}, c.env.CFURL)*/
-
-	team.Auth = teamAuth
+	team.Auth["groups"] = []string{orgSpaceAuth}
 
 	client, err := c.getAuthClient(c.env.ConcourseURL)
 	if err != nil {
 		c.logger.Error("create-team.auth-client-error", err)
 		return err
 	}
-	authMethods, err := client.Team(teamName).ListAuthMethods()
-	if err == nil || len(authMethods) > 0 {
-		err := fmt.Errorf("Team %s already exists", teamName)
-		c.logger.Error("create-team.existing-team-error", err,
-			lager.Data{
-				"team-name":         teamName,
-				"auth-methods-size": len(authMethods),
-			})
-		return err
-	}
+
 	_, created, updated, err := client.Team(teamName).CreateOrUpdate(team)
 	if err != nil {
 		c.logger.Error("create-team.unknown-create-error", err,
