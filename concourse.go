@@ -1,12 +1,18 @@
 package main
 
 import (
+	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"net"
+	"net/http"
+	"time"
 
 	"code.cloudfoundry.org/lager"
 	"github.com/concourse/atc"
 	"github.com/concourse/go-concourse/concourse"
+	"golang.org/x/oauth2"
 )
 
 const adminTeam = "main"
@@ -17,9 +23,21 @@ type IccClient interface {
 	DeleteTeam(details cfDetails) error
 }
 
+type concourseClient struct {
+	client concourse.Client
+	env    brokerConfig
+	logger lager.Logger
+}
+
 // NewClient returns a client that can be used to interface with a deployed Concourse CI instance.
 func concourseNewClient(env brokerConfig, logger lager.Logger) IccClient {
-	httpClient := newBasicAuthClient(env.AdminUsername, env.AdminPassword)
+	httpClient := &http.Client{
+		Transport: &http.Transport{
+			Dial: (&net.Dialer{
+				Timeout: 10 * time.Second,
+			}).Dial,
+		},
+	}
 
 	return &concourseClient{
 		client: concourse.NewClient(env.ConcourseURL, httpClient, false),
@@ -27,14 +45,41 @@ func concourseNewClient(env brokerConfig, logger lager.Logger) IccClient {
 		logger: logger.Session("concourse-client")}
 }
 
-type concourseClient struct {
-	client concourse.Client
-	env    brokerConfig
-	logger lager.Logger
-}
+func (c *concourseClient) getAuthClient() (concourse.Client, error) {
+	oauth2Config := oauth2.Config{
+		ClientID:     "fly",
+		ClientSecret: "Zmx5",
+		Endpoint:     oauth2.Endpoint{TokenURL: c.client.URL() + "/sky/token"},
+		Scopes:       []string{"openid", "profile", "email", "federated:id", "groups"},
+	}
 
-func (c *concourseClient) getAuthClient(concourseURL string) (concourse.Client, error) {
-	return c.client, nil
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, c.client.HTTPClient())
+
+	token, err := oauth2Config.PasswordCredentialsToken(ctx, c.env.AdminUsername, c.env.AdminPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	var transport http.RoundTripper
+
+	transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+		Dial: (&net.Dialer{
+			Timeout: 10 * time.Second,
+		}).Dial,
+		Proxy: http.ProxyFromEnvironment,
+	}
+
+	httpClient := &http.Client{
+		Transport: &oauth2.Transport{
+			Source: oauth2.StaticTokenSource(token),
+			Base:   transport,
+		},
+	}
+
+	return concourse.NewClient(c.env.ConcourseURL, httpClient, false), nil
 }
 
 func (c *concourseClient) getTeamName(details cfDetails) string {
@@ -48,7 +93,7 @@ func (c *concourseClient) CreateTeam(details cfDetails) error {
 	team := atc.Team{}
 	team.Auth["groups"] = []string{orgSpaceAuth}
 
-	client, err := c.getAuthClient(c.env.ConcourseURL)
+	client, err := c.getAuthClient()
 	if err != nil {
 		c.logger.Error("create-team.auth-client-error", err)
 		return err
@@ -75,7 +120,7 @@ func (c *concourseClient) CreateTeam(details cfDetails) error {
 
 func (c *concourseClient) DeleteTeam(details cfDetails) error {
 	teamName := c.getTeamName(details)
-	client, err := c.getAuthClient(c.env.ConcourseURL)
+	client, err := c.getAuthClient()
 	if err != nil {
 		c.logger.Error("delete-team.auth-client-error", err)
 		return err
