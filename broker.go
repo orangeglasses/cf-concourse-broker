@@ -14,8 +14,8 @@ type broker struct {
 	env      brokerConfig
 }
 
-func (b *broker) Services(context context.Context) []brokerapi.Service {
-	return b.services
+func (b *broker) Services(context context.Context) ([]brokerapi.Service, error) {
+	return b.services, nil
 }
 
 func (b *broker) Provision(context context.Context, instanceID string, details brokerapi.ProvisionDetails, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
@@ -56,18 +56,30 @@ func (b *broker) Deprovision(context context.Context, instanceID string, details
 	return brokerapi.DeprovisionServiceSpec{}, concourseClient.DeleteTeam(orgName)
 }
 
-func (b *broker) Bind(context context.Context, instanceID, bindingID string, details brokerapi.BindDetails) (brokerapi.Binding, error) {
+func (b *broker) GetInstance(ctx context.Context, instanceID string) (brokerapi.GetInstanceDetailsSpec, error) {
+	return brokerapi.GetInstanceDetailsSpec{}, errors.New("Instance retrieval not supported")
+}
+
+func (b *broker) Bind(context context.Context, instanceID, bindingID string, details brokerapi.BindDetails, asyncAllowed bool) (brokerapi.Binding, error) {
 	return brokerapi.Binding{}, errors.New("This service does not support bind")
 }
 
-func (b *broker) Unbind(context context.Context, instanceID, bindingID string, details brokerapi.UnbindDetails) error {
-	return errors.New("This service does not support bind")
+func (b *broker) Unbind(context context.Context, instanceID, bindingID string, details brokerapi.UnbindDetails, asyncAllowed bool) (brokerapi.UnbindSpec, error) {
+	return brokerapi.UnbindSpec{}, errors.New("This service does not support bind")
+}
+
+func (b *broker) GetBinding(ctx context.Context, instanceID, bindingID string) (brokerapi.GetBindingSpec, error) {
+	return brokerapi.GetBindingSpec{}, errors.New("This service does not support bind")
+}
+
+func (b *broker) LastBindingOperation(ctx context.Context, instanceID, bindingID string, details brokerapi.PollDetails) (brokerapi.LastOperation, error) {
+	return brokerapi.LastOperation{}, errors.New("This service does not support bind")
 }
 
 func (b *broker) Update(context context.Context, instanceID string, details brokerapi.UpdateDetails, asyncAllowed bool) (brokerapi.UpdateServiceSpec, error) {
 	return brokerapi.UpdateServiceSpec{}, nil
 }
 
-func (b *broker) LastOperation(context context.Context, instanceID, operationData string) (brokerapi.LastOperation, error) {
+func (b *broker) LastOperation(context context.Context, instanceID string, details brokerapi.PollDetails) (brokerapi.LastOperation, error) {
 	return brokerapi.LastOperation{}, nil
 }

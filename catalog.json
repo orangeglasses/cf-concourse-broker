@@ -8,6 +8,7 @@
     "documentationUrl": ""
   },
   "plan_updateable": true,
+  "instances_retrievable": false,
   "plans": [
     {
       "id": "334744a3-f12f-4004-a94e-d7132a0d0706",

@@ -11,7 +11,7 @@ func TestBrokerServices(t *testing.T) {
 	services, _ := CatalogLoad("./catalog.json")
 	serviceBroker := &broker{services: services, logger: nil, env: config}
 
-	returnedServices := serviceBroker.Services(nil)
+	returnedServices, _ := serviceBroker.Services(nil)
 	if returnedServices == nil || len(returnedServices) == 0 {
 		t.Error("No services returned.")
 	}
@@ -30,7 +30,7 @@ func TestBrokerBind(t *testing.T) {
 		RawParameters: nil,
 	}
 
-	_, err := serviceBroker.Bind(nil, "fakeInstanceId", "fakeBindingId", fakeDetails)
+	_, err := serviceBroker.Bind(nil, "fakeInstanceId", "fakeBindingId", fakeDetails, false)
 	/*if err != nil {
 		t.Error("serviceBroker.Bind returned error: " + err.Error())
 	}*/
