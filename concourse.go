@@ -4,14 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/concourse/atc"
-	"github.com/concourse/go-concourse/concourse"
+	"github.com/concourse/concourse/atc"
+	"github.com/concourse/concourse/go-concourse/concourse"
 	"golang.org/x/oauth2"
 )
 
@@ -88,10 +87,14 @@ func (c *concourseClient) getTeamName(details cfDetails) string {
 
 func (c *concourseClient) CreateTeam(details cfDetails) error {
 	teamName := c.getTeamName(details)
-
-	orgSpaceAuth := fmt.Sprintf("%v:%v", details.OrgName, details.SpaceName)
-	team := atc.Team{}
-	team.Auth["groups"] = []string{orgSpaceAuth}
+	team := atc.Team{
+		Name: teamName,
+		Auth: atc.TeamAuth{
+			"owner": map[string][]string{
+				"groups": []string{details.OrgName},
+			},
+		},
+	}
 
 	client, err := c.getAuthClient()
 	if err != nil {
