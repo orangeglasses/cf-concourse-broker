@@ -71,11 +71,13 @@
 		},
 		{
 			"ImportPath": "github.com/pivotal-cf/brokerapi",
-			"Rev": "8f25c50c2794f9401a0162e260801e877ea3d002"
+			"Comment": "v3.0.3-2-ga17f228",
+			"Rev": "a17f228471ddaca621046f0e14e85c0004aadf82"
 		},
 		{
 			"ImportPath": "github.com/pivotal-cf/brokerapi/auth",
-			"Rev": "8f25c50c2794f9401a0162e260801e877ea3d002"
+			"Comment": "v3.0.3-2-ga17f228",
+			"Rev": "a17f228471ddaca621046f0e14e85c0004aadf82"
 		},
 		{
 			"ImportPath": "github.com/pkg/errors",
