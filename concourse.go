@@ -24,6 +24,9 @@ type concourseTarget struct {
 func concourseNewClient(env brokerConfig, logger lager.Logger) *concourseTarget {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 			Dial: (&net.Dialer{
 				Timeout: 10 * time.Second,
 			}).Dial,
