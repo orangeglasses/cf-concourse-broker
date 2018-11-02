@@ -1,26 +1,10 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-
 	"github.com/cloudfoundry-community/go-cfclient"
 )
 
-type cfDetails struct {
-	OrgGUID   string
-	OrgName   string
-	SpaceGUID string
-	SpaceName string
-}
-
-type IcfClient interface {
-	GetProvisionDetails(spaceGUID string) (cfDetails, error)
-	GetDeprovisionDetails(serviceGUID string) (cfDetails, error)
-}
-
-func cfNewClient(config brokerConfig) (IcfClient, error) {
+func cfNewClient(config brokerConfig) (*cfClient, error) {
 	cfConfig := &cfclient.Config{
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
@@ -37,57 +21,16 @@ type cfClient struct {
 	client *cfclient.Client
 }
 
-func (c *cfClient) GetProvisionDetails(spaceGUID string) (cfDetails, error) {
-	requestURI := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
-	orgName, err := c.getOrgName(requestURI)
-	if err != nil {
-		return cfDetails{}, err
-	}
-	return cfDetails{OrgName: orgName}, nil
+func (c *cfClient) getServiceInstanceByGuid(siGUID string) (cfclient.ServiceInstance, error) {
+	return c.client.ServiceInstanceByGuid(siGUID)
 }
 
-func (c *cfClient) GetDeprovisionDetails(serviceGUID string) (cfDetails, error) {
-	serviceInstance, err := c.client.ServiceInstanceByGuid(serviceGUID)
+func (c *cfClient) getOrgNameBySpaceGuid(spaceGUID string) (string, error) {
+	space, err := c.client.GetSpaceByGuid(spaceGUID)
 	if err != nil {
-		return cfDetails{}, err
+		return "", err
 	}
-	orgName, err := c.getOrgName(serviceInstance.SpaceUrl)
-	if err != nil {
-		return cfDetails{}, err
-	}
-	return cfDetails{OrgName: orgName}, nil
-}
 
-func (c *cfClient) getOrgName(requestUrl string) (string, error) {
-	var spaceResp cfclient.SpaceResource
-	r := c.client.NewRequest("GET", requestUrl)
-	resp, err := c.client.DoRequest(r)
-	if err != nil {
-		return "", fmt.Errorf("Error requesting spaces %v", err)
-	}
-	resBody, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if err != nil {
-		return "", fmt.Errorf("Error reading space request %v", err)
-	}
-	err = json.Unmarshal(resBody, &spaceResp)
-	if err != nil {
-		return "", fmt.Errorf("Error unmarshalling space %v", err)
-	}
-	var orgResp cfclient.OrgResource
-	r = c.client.NewRequest("GET", spaceResp.Entity.OrgURL)
-	resp, err = c.client.DoRequest(r)
-	if err != nil {
-		return "", fmt.Errorf("Error requesting orgs %v", err)
-	}
-	resBody, err = ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if err != nil {
-		return "", fmt.Errorf("Error reading org request %v", err)
-	}
-	err = json.Unmarshal(resBody, &orgResp)
-	if err != nil {
-		return "", fmt.Errorf("Error unmarshalling org %v", err)
-	}
-	return orgResp.Entity.Name, nil
+	org, _ := space.Org()
+	return org.Name, nil
 }

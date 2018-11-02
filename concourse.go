@@ -14,22 +14,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const adminTeam = "main"
-
-// IccClient defines the capabilities that any concourse client should be able to do.
-type IccClient interface {
-	CreateTeam(details cfDetails) error
-	DeleteTeam(details cfDetails) error
+type concourseTarget struct {
+	client   concourse.Client
+	username string
+	password string
+	logger   lager.Logger
 }
 
-type concourseClient struct {
-	client concourse.Client
-	env    brokerConfig
-	logger lager.Logger
-}
-
-// NewClient returns a client that can be used to interface with a deployed Concourse CI instance.
-func concourseNewClient(env brokerConfig, logger lager.Logger) IccClient {
+func concourseNewClient(env brokerConfig, logger lager.Logger) *concourseTarget {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			Dial: (&net.Dialer{
@@ -38,13 +30,14 @@ func concourseNewClient(env brokerConfig, logger lager.Logger) IccClient {
 		},
 	}
 
-	return &concourseClient{
-		client: concourse.NewClient(env.ConcourseURL, httpClient, false),
-		env:    env,
-		logger: logger.Session("concourse-client")}
+	return &concourseTarget{
+		client:   concourse.NewClient(env.ConcourseURL, httpClient, false),
+		username: env.AdminUsername,
+		password: env.AdminPassword,
+		logger:   logger.Session("concourse-target")}
 }
 
-func (c *concourseClient) getAuthClient() (concourse.Client, error) {
+func (c *concourseTarget) Client() (concourse.Client, error) {
 	oauth2Config := oauth2.Config{
 		ClientID:     "fly",
 		ClientSecret: "Zmx5",
@@ -54,7 +47,7 @@ func (c *concourseClient) getAuthClient() (concourse.Client, error) {
 
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, c.client.HTTPClient())
 
-	token, err := oauth2Config.PasswordCredentialsToken(ctx, c.env.AdminUsername, c.env.AdminPassword)
+	token, err := oauth2Config.PasswordCredentialsToken(ctx, c.username, c.password)
 	if err != nil {
 		return nil, err
 	}
@@ -78,25 +71,21 @@ func (c *concourseClient) getAuthClient() (concourse.Client, error) {
 		},
 	}
 
-	return concourse.NewClient(c.env.ConcourseURL, httpClient, false), nil
+	return concourse.NewClient(c.client.URL(), httpClient, false), nil
 }
 
-func (c *concourseClient) getTeamName(details cfDetails) string {
-	return details.OrgName
-}
-
-func (c *concourseClient) CreateTeam(details cfDetails) error {
-	teamName := c.getTeamName(details)
+func (c *concourseTarget) CreateTeam(orgName string) error {
+	teamName := orgName
 	team := atc.Team{
 		Name: teamName,
 		Auth: atc.TeamAuth{
 			"owner": map[string][]string{
-				"groups": []string{details.OrgName},
+				"groups": []string{orgName},
 			},
 		},
 	}
 
-	client, err := c.getAuthClient()
+	client, err := c.Client()
 	if err != nil {
 		c.logger.Error("create-team.auth-client-error", err)
 		return err
@@ -121,14 +110,13 @@ func (c *concourseClient) CreateTeam(details cfDetails) error {
 	return nil
 }
 
-func (c *concourseClient) DeleteTeam(details cfDetails) error {
-	teamName := c.getTeamName(details)
-	client, err := c.getAuthClient()
+func (c *concourseTarget) DeleteTeam(teamName string) error {
+	client, err := c.Client()
 	if err != nil {
 		c.logger.Error("delete-team.auth-client-error", err)
 		return err
 	}
-	err = client.Team(details.OrgName).DestroyTeam(teamName)
+	err = client.Team(teamName).DestroyTeam(teamName)
 	if err != nil {
 		c.logger.Error("delete-team.unknown-delete-error", err,
 			lager.Data{

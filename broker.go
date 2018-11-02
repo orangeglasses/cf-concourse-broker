@@ -23,34 +23,37 @@ func (b *broker) Provision(context context.Context, instanceID string, details b
 	if err != nil {
 		return brokerapi.ProvisionedServiceSpec{}, err
 	}
-	cfDetails, err := cfClient.GetProvisionDetails(details.SpaceGUID)
-	cfDetails.SpaceGUID = details.SpaceGUID
+
+	orgName, err := cfClient.getOrgNameBySpaceGuid(details.SpaceGUID)
 	if err != nil {
 		return brokerapi.ProvisionedServiceSpec{}, err
 	}
+
 	concourseClient := concourseNewClient(b.env, b.logger)
-	err = concourseClient.CreateTeam(cfDetails)
-	if err != nil {
-		return brokerapi.ProvisionedServiceSpec{}, err
-	}
-	return brokerapi.ProvisionedServiceSpec{}, nil
+	return brokerapi.ProvisionedServiceSpec{}, concourseClient.CreateTeam(orgName)
 }
 
 func (b *broker) Deprovision(context context.Context, instanceID string, details brokerapi.DeprovisionDetails, asyncAllowed bool) (brokerapi.DeprovisionServiceSpec, error) {
+	//get a CF Client to lookup orgName
 	cfClient, err := cfNewClient(b.env)
 	if err != nil {
 		return brokerapi.DeprovisionServiceSpec{}, err
 	}
-	cfDetails, err := cfClient.GetDeprovisionDetails(instanceID)
+
+	//lookup service instance to find space guid
+	serviceInstance, err := cfClient.getServiceInstanceByGuid(details.ServiceID)
 	if err != nil {
 		return brokerapi.DeprovisionServiceSpec{}, err
 	}
+
+	//use space guid to lookup org name. Orgname is used as team name
+	orgName, err := cfClient.getOrgNameBySpaceGuid(serviceInstance.SpaceGuid)
+	if err != nil {
+		return brokerapi.DeprovisionServiceSpec{}, err
+	}
+
 	concourseClient := concourseNewClient(b.env, b.logger)
-	err = concourseClient.DeleteTeam(cfDetails)
-	if err != nil {
-		return brokerapi.DeprovisionServiceSpec{}, err
-	}
-	return brokerapi.DeprovisionServiceSpec{}, nil
+	return brokerapi.DeprovisionServiceSpec{}, concourseClient.DeleteTeam(orgName)
 }
 
 func (b *broker) Bind(context context.Context, instanceID, bindingID string, details brokerapi.BindDetails) (brokerapi.Binding, error) {
