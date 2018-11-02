@@ -1,0 +1,119 @@
+{
+	"ImportPath": "github.com/orangeglasses/cf-concourse-broker",
+	"GoVersion": "go1.9",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "code.cloudfoundry.org/lager",
+			"Rev": "de8e9c6c6e474e5e3668aea1a9817bdb4ceeceb0"
+		},
+		{
+			"ImportPath": "github.com/bmizerany/pat",
+			"Rev": "c068ca2f0aacee5ac3681d68e4d0a003b7d1fd2c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-community/go-cfclient",
+			"Rev": "dc99b025da3edd4d0bd7270bf285d31d47232b41"
+		},
+		{
+			"ImportPath": "github.com/concourse/concourse/atc",
+			"Comment": "v4.2.1-9068-gb058c75",
+			"Rev": "b058c751793a509ce7763707d0e8ad6e09412a76"
+		},
+		{
+			"ImportPath": "github.com/concourse/concourse/atc/event",
+			"Comment": "v4.2.1-9068-gb058c75",
+			"Rev": "b058c751793a509ce7763707d0e8ad6e09412a76"
+		},
+		{
+			"ImportPath": "github.com/concourse/concourse/go-concourse/concourse",
+			"Comment": "v4.2.1-9068-gb058c75",
+			"Rev": "b058c751793a509ce7763707d0e8ad6e09412a76"
+		},
+		{
+			"ImportPath": "github.com/concourse/concourse/go-concourse/concourse/eventstream",
+			"Comment": "v4.2.1-9068-gb058c75",
+			"Rev": "b058c751793a509ce7763707d0e8ad6e09412a76"
+		},
+		{
+			"ImportPath": "github.com/concourse/concourse/go-concourse/concourse/internal",
+			"Comment": "v4.2.1-9068-gb058c75",
+			"Rev": "b058c751793a509ce7763707d0e8ad6e09412a76"
+		},
+		{
+			"ImportPath": "github.com/google/jsonapi",
+			"Comment": "1.0.0-18-g3b9f84a",
+			"Rev": "3b9f84a311d8b9bae45e87f1cb8d03e789191b40"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.6.0-5-g7904d2e",
+			"Rev": "7904d2e42e7ebbdb4a6eb3e57eb201b11df25c57"
+		},
+		{
+			"ImportPath": "github.com/jessevdk/go-flags",
+			"Comment": "v1.2.0-1-g460c7bb",
+			"Rev": "460c7bb0abd6e927f2767cadc91aa6ef776a98b4"
+		},
+		{
+			"ImportPath": "github.com/kelseyhightower/envconfig",
+			"Comment": "v1.3.0-5-gb6fde16",
+			"Rev": "b6fde1625d631a48340817849a547164f395d9eb"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/mapstructure",
+			"Rev": "53818660ed4955e899c0bcafa97299a388bd7c8e"
+		},
+		{
+			"ImportPath": "github.com/peterhellberg/link",
+			"Comment": "v1.0.0-3-g3eea38c",
+			"Rev": "3eea38ca14b7b3252feea5daf92be3864209eb1d"
+		},
+		{
+			"ImportPath": "github.com/pivotal-cf/brokerapi",
+			"Rev": "8f25c50c2794f9401a0162e260801e877ea3d002"
+		},
+		{
+			"ImportPath": "github.com/pivotal-cf/brokerapi/auth",
+			"Rev": "8f25c50c2794f9401a0162e260801e877ea3d002"
+		},
+		{
+			"ImportPath": "github.com/pkg/errors",
+			"Comment": "v0.8.0-5-gc605e28",
+			"Rev": "c605e284fe17294bda444b34710735b29d1a9d90"
+		},
+		{
+			"ImportPath": "github.com/tedsuo/rata",
+			"Comment": "v1.0.0",
+			"Rev": "0649c23705dfb45a9693b668c4fc1c0666f485d9"
+		},
+		{
+			"ImportPath": "github.com/vito/go-sse/sse",
+			"Rev": "fd69d275caac5d78d793e77ddbe9bd2001d9b88d"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "13449ad91cb26cb47661c1b080790392170385fd"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/clientcredentials",
+			"Rev": "13449ad91cb26cb47661c1b080790392170385fd"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "13449ad91cb26cb47661c1b080790392170385fd"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
+		}
+	]
+}
