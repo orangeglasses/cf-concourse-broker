@@ -79,8 +79,8 @@ func (c *concourseTarget) Client() (concourse.Client, error) {
 
 func (c *concourseTarget) CreateTeam(orgName string) error {
 	teamName := orgName
+
 	team := atc.Team{
-		Name: teamName,
 		Auth: atc.TeamAuth{
 			"owner": map[string][]string{
 				"groups": []string{orgName},
