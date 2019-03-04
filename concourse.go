@@ -6,11 +6,12 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/concourse/concourse/atc"
-	"github.com/concourse/concourse/go-concourse/concourse"
+	"github.com/concourse/atc"
+	"github.com/concourse/go-concourse/concourse"
 	"golang.org/x/oauth2"
 )
 
@@ -79,12 +80,15 @@ func (c *concourseTarget) Client() (concourse.Client, error) {
 
 func (c *concourseTarget) CreateTeam(orgName string) error {
 	teamName := orgName
+	groups := []string{}
+	users := []string{}
+
+	groups = append(groups, "cf:"+strings.ToLower(orgName))
 
 	team := atc.Team{
-		Auth: atc.TeamAuth{
-			"owner": map[string][]string{
-				"groups": []string{orgName},
-			},
+		Auth: map[string][]string{
+			"users":  users,
+			"groups": groups,
 		},
 	}
 
