@@ -1,13 +1,12 @@
 # cf-concourse-broker
-Cloud foundry service broker for Concourse CI. Heavily based (well... ripoff :) ) on the [concourse-broker from 18F](https://github.com/18F/concourse-broker) but with changes to make it compatible with concourse 3 and simplyfied code structure.
+Cloud foundry service broker for Concourse CI. Heavily based (well... ripoff :) ) on the [concourse-broker from 18F](https://github.com/18F/concourse-broker) but with changes to make it compatible with concourse 5 and simplyfied code structure.
 
 This is an **experimental** Cloud Foundry Service Broker for
-provisioning teams on a deployed [Concourse CI](https://concourse.ci/)
+provisioning teams on a deployed [Concourse CI](https://concourse-ci.org/)
 instance.
 
-It requires a deployed Concourse CI instance in which the [`main` team](https://concourse.ci/teams.html#main-team) is authenticated via Basic Auth.
+It requires a deployed Concourse CI instance in which the [`main` team](https://concourse.ci/teams.html#main-team) is authenticated via Basic Auth. It also requires CF Auu Authentication to be setup.
 
-**IMPORTANT**: You must trust the users of your CloudFoundry installation implicitly before enabling in your environment. See: http://concourse.ci/teams.html#section_teams-caveats
 
 ## Setup
 
