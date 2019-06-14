@@ -41,7 +41,7 @@ func (b *broker) Deprovision(context context.Context, instanceID string, details
 	}
 
 	//lookup service instance to find space guid
-	serviceInstance, err := cfClient.getServiceInstanceByGuid(details.ServiceID)
+	serviceInstance, err := cfClient.getServiceInstanceByGuid(instanceID)
 	if err != nil {
 		return brokerapi.DeprovisionServiceSpec{}, err
 	}
